@@ -12,6 +12,7 @@ import { FeedbackDemo } from "./screens/FeedbackDemo";
 import { OverlayDemo } from "./screens/OverlayDemo";
 import { LayoutDemo } from "./screens/LayoutDemo";
 import { NavigationDemo } from "./screens/NavigationDemo";
+import { ChartsDemo } from "./screens/ChartsDemo";
 import { ToastProvider } from "./components/ui/toast";
 
 export default function App() {
@@ -28,6 +29,7 @@ export default function App() {
       case "overlays": return <OverlayDemo />;
       case "layout": return <LayoutDemo />;
       case "navigation": return <NavigationDemo />;
+      case "charts": return <ChartsDemo />;
       default: return <HomeScreen />;
     }
   };

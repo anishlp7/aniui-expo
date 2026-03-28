@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View } from "react-native";
+import { View, Text as RNText } from "react-native";
 import { DemoLayout, Section, Row, Spacer } from "./DemoLayout";
 import { Text } from "../components/ui/text";
 import { Button } from "../components/ui/button";
@@ -55,8 +55,40 @@ export function CoreDemo() {
       <Section title="Input">
         <View className="gap-3">
           <View className="gap-1.5">
-            <Label>Email</Label>
+            <Label>Default</Label>
             <Input value={input} onChangeText={setInput} placeholder="you@example.com" keyboardType="email-address" />
+          </View>
+          <View className="gap-1.5">
+            <Label>Leading Icon</Label>
+            <Input
+              placeholder="Search..."
+              leadingIcon={<RNText style={{ fontSize: 16, color: "#9ca3af" }}>🔍</RNText>}
+            />
+          </View>
+          <View className="gap-1.5">
+            <Label>Trailing Icon</Label>
+            <Input
+              placeholder="Enter password"
+              secureTextEntry
+              trailingIcon={<RNText style={{ fontSize: 16, color: "#9ca3af" }}>👁</RNText>}
+            />
+          </View>
+          <View className="gap-1.5">
+            <Label>Both Icons</Label>
+            <Input
+              placeholder="0.00"
+              keyboardType="numeric"
+              leadingIcon={<RNText style={{ fontSize: 14, fontWeight: "600", color: "#9ca3af" }}>$</RNText>}
+              trailingIcon={<RNText style={{ fontSize: 12, color: "#9ca3af" }}>USD</RNText>}
+            />
+          </View>
+          <View className="gap-1.5">
+            <Label>Ghost with Icon</Label>
+            <Input
+              variant="ghost"
+              placeholder="Search anything..."
+              leadingIcon={<RNText style={{ fontSize: 16, color: "#9ca3af" }}>🔍</RNText>}
+            />
           </View>
           <View className="gap-1.5">
             <Label>Disabled</Label>
