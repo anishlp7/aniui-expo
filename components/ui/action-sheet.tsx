@@ -1,7 +1,11 @@
 import React, { forwardRef, useCallback } from "react";
 import { View, Pressable, Text } from "react-native";
-import GorhomBottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
-import { cn } from "../../lib/utils";
+import {
+  BottomSheetModal,
+  BottomSheetBackdrop,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
+import { cn } from "@/lib/utils";
 
 export interface ActionSheetAction {
   label: string;
@@ -16,7 +20,7 @@ export interface ActionSheetProps {
   onCancel?: () => void;
 }
 
-export const ActionSheet = forwardRef<GorhomBottomSheet, ActionSheetProps>(
+export const ActionSheet = forwardRef<BottomSheetModal, ActionSheetProps>(
   ({ className, title, actions, onCancel }, ref) => {
     const renderBackdrop = useCallback(
       (backdropProps: React.ComponentProps<typeof BottomSheetBackdrop>) => (
@@ -26,14 +30,13 @@ export const ActionSheet = forwardRef<GorhomBottomSheet, ActionSheetProps>(
     );
 
     return (
-      <GorhomBottomSheet
+      <BottomSheetModal
         ref={ref}
-        index={-1}
         enableDynamicSizing
         enablePanDownToClose
         backdropComponent={renderBackdrop}
-        backgroundStyle={{ backgroundColor: "hsl(0 0% 100%)" }}
-        handleIndicatorStyle={{ backgroundColor: "hsl(240 3.8% 46.1%)" }}
+        backgroundStyle={{ backgroundColor: "#ffffff" }}
+        handleIndicatorStyle={{ backgroundColor: "#71717a" }}
       >
         <BottomSheetView>
           <View className={cn("pb-8 px-4", className)}>
@@ -58,7 +61,7 @@ export const ActionSheet = forwardRef<GorhomBottomSheet, ActionSheetProps>(
             )}
           </View>
         </BottomSheetView>
-      </GorhomBottomSheet>
+      </BottomSheetModal>
     );
   }
 );

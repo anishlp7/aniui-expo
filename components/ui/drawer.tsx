@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { View, Pressable, Modal } from "react-native";
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from "react-native-reanimated";
-import { cn } from "../../lib/utils";
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated";
+import { cn } from "@/lib/utils";
 
 export interface DrawerProps {
   open: boolean;
@@ -28,18 +28,24 @@ export function Drawer({ open, onOpenChange, side = "left", children }: DrawerPr
 
   return (
     <Modal visible={open} transparent animationType="none" onRequestClose={close}>
-      <Pressable className="absolute inset-0" onPress={close} accessible={false}>
-        <Animated.View className="flex-1 bg-black" style={overlayStyle} />
+      <Pressable style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }} onPress={close} accessible={false}>
+        <Animated.View style={[{ flex: 1, backgroundColor: "#000000" }, overlayStyle]} />
       </Pressable>
       <Animated.View
-        className={cn(
-          "absolute top-0 bottom-0 w-72 bg-background border-border",
-          side === "left" ? "left-0 border-r" : "right-0 border-l"
-        )}
-        style={drawerStyle}
-        accessibilityRole="menu"
+        style={[
+          {
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            width: 288,
+            ...(side === "left" ? { left: 0 } : { right: 0 }),
+          },
+          drawerStyle,
+        ]}
       >
-        {children}
+        <View className={cn("flex-1 bg-card", side === "left" ? "border-r border-border" : "border-l border-border")} accessibilityRole="menu">
+          {children}
+        </View>
       </Animated.View>
     </Modal>
   );

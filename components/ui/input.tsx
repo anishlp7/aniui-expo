@@ -1,10 +1,10 @@
 import React from "react";
 import { View, TextInput } from "react-native";
 import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "../../lib/utils";
+import { cn } from "@/lib/utils";
 
 const inputVariants = cva(
-  "rounded-md border text-foreground placeholder:text-muted-foreground",
+  "rounded-md border py-2 text-foreground placeholder:text-muted-foreground",
   {
     variants: {
       variant: {
@@ -46,7 +46,7 @@ export function Input({
     return (
       <TextInput
         className={cn(inputVariants({ variant, size }), className)}
-        placeholderTextColor="hsl(240 3.8% 46.1%)"
+        placeholderTextColor="#71717a"
         {...props}
       />
     );
@@ -63,7 +63,7 @@ export function Input({
       {leadingIcon && <View className="mr-2">{leadingIcon}</View>}
       <TextInput
         className="flex-1 text-foreground p-0 text-base"
-        placeholderTextColor="hsl(240 3.8% 46.1%)"
+        placeholderTextColor="#71717a"
         {...props}
       />
       {trailingIcon && <View className="ml-2">{trailingIcon}</View>}
