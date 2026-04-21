@@ -28,8 +28,15 @@ import { NumberInput } from "@/components/ui/number-input";
 import { DatePicker } from "@/components/ui/date-picker";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { Combobox } from "@/components/ui/combobox";
+import { CommandMenu } from "@/components/ui/command-menu";
+import { DataTable } from "@/components/ui/data-table";
 import { FilePicker } from "@/components/ui/file-picker";
 import { Label } from "@/components/ui/label";
+import { Field, FieldLabel, FieldDescription, FieldError } from "@/components/ui/field";
+import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupButton, InputGroupText } from "@/components/ui/input-group";
+import { Kbd, KbdGroup } from "@/components/ui/kbd";
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
+import { DirectionProvider, useDirection } from "@/components/ui/direction-provider";
 
 // Display
 import { Badge } from "@/components/ui/badge";
@@ -66,7 +73,7 @@ import { ToastProvider, useToast } from "@/components/ui/toast";
 
 // Navigation
 import { Accordion, AccordionItem } from "@/components/ui/accordion";
-import { TabsDemo } from "@/components/tabs-demo";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from "@/components/ui/alert-dialog";
@@ -243,7 +250,7 @@ const demos: Record<string, () => React.ReactElement> = {
             </View>
             <View className="flex-row items-center justify-between px-4 py-3">
               <Text className="text-sm text-foreground">Sound Effects</Text>
-              <Switch value={sound} onValueChange={setSound} />
+              <Switch value={sound} trackColorOff="red" trackColorOn="green" thumbColorAndroid="#18181b" onValueChange={setSound} />
             </View>
             <View className="flex-row items-center justify-between px-4 py-3">
               <Text className="text-sm text-foreground">Auto-Update</Text>
@@ -594,27 +601,93 @@ const demos: Record<string, () => React.ReactElement> = {
   },
   combobox: () => {
     const [val, setVal] = useState("");
+    const [multiVal, setMultiVal] = useState<string[]>([]);
+    const [groupVal, setGroupVal] = useState("");
+    const [clearVal, setClearVal] = useState("rn");
+    const [invalidVal, setInvalidVal] = useState("");
+    const [popupVal, setPopupVal] = useState("");
+    const frameworks = [
+      { label: "React Native", value: "rn" },
+      { label: "Flutter", value: "flutter" },
+      { label: "Swift UI", value: "swiftui" },
+      { label: "Jetpack Compose", value: "compose" },
+      { label: "Kotlin Multiplatform", value: "kmp" },
+    ];
+    const tags = [
+      { label: "React Native", value: "rn" },
+      { label: "TypeScript", value: "ts" },
+      { label: "NativeWind", value: "nw" },
+      { label: "Expo", value: "expo" },
+      { label: "Reanimated", value: "reanimated" },
+    ];
     return (
       <View className="gap-6">
-        <Text className="text-sm text-muted-foreground">A searchable dropdown that combines a text input with a filterable options list. Type to filter, then select from matching results.</Text>
+        <Text className="text-sm text-muted-foreground">A searchable select with multi-select, groups, clear button, custom rendering, and more. Type to filter, then select from matching results.</Text>
         <View className="gap-2">
-          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Example</Text>
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Basic</Text>
           <View className="rounded-lg border border-border bg-card p-4 gap-3">
             <Label>Framework</Label>
-            <Combobox
-              placeholder="Select framework..."
-              searchPlaceholder="Search..."
-              options={[
-                { label: "React Native", value: "rn" },
-                { label: "Flutter", value: "flutter" },
-                { label: "Swift UI", value: "swiftui" },
-                { label: "Jetpack Compose", value: "compose" },
-                { label: "Kotlin Multiplatform", value: "kmp" },
-              ]}
-              value={val}
-              onValueChange={setVal}
-            />
+            <Combobox placeholder="Select framework..." searchPlaceholder="Search..." options={frameworks} value={val} onValueChange={setVal} />
             {val ? <Text variant="muted">Selected: {val}</Text> : null}
+          </View>
+        </View>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Multiple Selection</Text>
+          <View className="rounded-lg border border-border bg-card p-4 gap-3">
+            <Label>Tags</Label>
+            <Combobox multiple placeholder="Select tags..." searchPlaceholder="Search tags..." options={tags} selectedValues={multiVal} onSelectedValuesChange={setMultiVal} />
+            {multiVal.length > 0 ? <Text variant="muted">Selected: {multiVal.join(", ")}</Text> : null}
+          </View>
+        </View>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Groups</Text>
+          <View className="rounded-lg border border-border bg-card p-4 gap-3">
+            <Label>Technology</Label>
+            <Combobox placeholder="Select..." searchPlaceholder="Search..." options={[]} groups={[{ label: "Frameworks", options: [{ label: "React Native", value: "rn" }, { label: "Flutter", value: "flutter" }, { label: "Swift UI", value: "swiftui" }] }, { label: "Languages", options: [{ label: "TypeScript", value: "ts" }, { label: "Dart", value: "dart" }, { label: "Swift", value: "swift" }] }]} value={groupVal} onValueChange={setGroupVal} />
+            {groupVal ? <Text variant="muted">Selected: {groupVal}</Text> : null}
+          </View>
+        </View>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Clear Button</Text>
+          <View className="rounded-lg border border-border bg-card p-4 gap-3">
+            <Label>Framework (clearable)</Label>
+            <Combobox placeholder="Select framework..." options={frameworks} value={clearVal} onValueChange={setClearVal} clearable />
+          </View>
+        </View>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Custom Items</Text>
+          <View className="rounded-lg border border-border bg-card p-4 gap-3">
+            <Label>Choose with custom rendering</Label>
+            <Combobox placeholder="Select..." options={frameworks} value={val} onValueChange={setVal} renderItem={(option, selected) => (<View className="flex-row items-center px-5 py-3 gap-3"><View className={selected ? "h-4 w-4 rounded-full bg-primary" : "h-4 w-4 rounded-full border border-input"} /><Text className="text-foreground">{option.label}</Text></View>)} />
+          </View>
+        </View>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Invalid</Text>
+          <View className="rounded-lg border border-border bg-card p-4 gap-3">
+            <Label>Required field</Label>
+            <Combobox placeholder="Select framework..." options={frameworks} value={invalidVal} onValueChange={setInvalidVal} invalid />
+            <Text className="text-sm text-destructive">Please select a framework</Text>
+          </View>
+        </View>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Disabled</Text>
+          <View className="rounded-lg border border-border bg-card p-4 gap-3">
+            <Combobox placeholder="Cannot interact..." options={frameworks} disabled />
+          </View>
+        </View>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Auto Highlight</Text>
+          <View className="rounded-lg border border-border bg-card p-4 gap-3">
+            <Label>Auto-highlights first match</Label>
+            <Combobox placeholder="Start typing..." options={frameworks} value={val} onValueChange={setVal} autoHighlight />
+          </View>
+        </View>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Popup Mode</Text>
+          <View className="rounded-lg border border-border bg-card p-4 gap-3">
+            <Label>Button-style trigger</Label>
+            <Combobox placeholder="Choose..." options={frameworks} value={popupVal} onValueChange={setPopupVal} mode="popup" />
+            {popupVal ? <Text variant="muted">Selected: {popupVal}</Text> : null}
           </View>
         </View>
       </View>
@@ -709,6 +782,315 @@ const demos: Record<string, () => React.ReactElement> = {
             <Button variant="outline" onPress={upload}>Retry</Button>
           </View>
         )}
+        </View>
+      </View>
+    );
+  },
+  "data-table": () => {
+    type User = { name: string; email: string; role: string; status: string };
+    const data: User[] = [
+      { name: "Alice Johnson", email: "alice@example.com", role: "Admin", status: "Active" },
+      { name: "Bob Smith", email: "bob@example.com", role: "Editor", status: "Active" },
+      { name: "Charlie Brown", email: "charlie@example.com", role: "Viewer", status: "Inactive" },
+      { name: "Diana Prince", email: "diana@example.com", role: "Admin", status: "Active" },
+      { name: "Eve Wilson", email: "eve@example.com", role: "Editor", status: "Inactive" },
+      { name: "Frank Miller", email: "frank@example.com", role: "Viewer", status: "Active" },
+    ];
+    return (
+      <View className="gap-6">
+        <Text className="text-sm text-muted-foreground">A sortable, filterable data table with pagination. Tap column headers to sort.</Text>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Basic</Text>
+          <DataTable columns={[{ key: "name", header: "Name" }, { key: "email", header: "Email" }, { key: "role", header: "Role" }]} data={data.slice(0, 3)} />
+        </View>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Sorting</Text>
+          <DataTable columns={[{ key: "name", header: "Name", sortable: true }, { key: "role", header: "Role", sortable: true }, { key: "status", header: "Status", sortable: true }]} data={data.slice(0, 4)} />
+        </View>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Search</Text>
+          <DataTable columns={[{ key: "name", header: "Name", sortable: true }, { key: "email", header: "Email", sortable: true }]} data={data} searchable searchKeys={["name", "email"]} searchPlaceholder="Search..." />
+        </View>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Pagination</Text>
+          <DataTable columns={[{ key: "name", header: "Name" }, { key: "role", header: "Role" }, { key: "status", header: "Status" }]} data={data} pageSize={3} />
+        </View>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Custom Cells</Text>
+          <DataTable columns={[{ key: "name", header: "Name" }, { key: "status", header: "Status", render: (val) => (<View className={`rounded-full px-2 py-0.5 self-start ${val === "Active" ? "bg-green-100 dark:bg-green-900" : "bg-red-100 dark:bg-red-900"}`}><Text className={`text-xs ${val === "Active" ? "text-green-700 dark:text-green-300" : "text-red-700 dark:text-red-300"}`}>{String(val)}</Text></View>) }]} data={data.slice(0, 4)} />
+        </View>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Striped</Text>
+          <DataTable columns={[{ key: "name", header: "Name" }, { key: "email", header: "Email" }, { key: "role", header: "Role" }]} data={data} striped />
+        </View>
+      </View>
+    );
+  },
+  "command-menu": () => {
+    const [open, setOpen] = useState(false);
+    const [selected, setSelected] = useState("");
+    return (
+      <View className="gap-6">
+        <Text className="text-sm text-muted-foreground">Spotlight-style command palette with search, groups, and shortcuts.</Text>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Example</Text>
+          <View className="rounded-lg border border-border bg-card p-4 gap-3">
+            <Pressable onPress={() => setOpen(true)} className="flex-row items-center min-h-12 px-4 rounded-md border border-input bg-background"><Text className="text-muted-foreground text-sm flex-1">Type a command...</Text></Pressable>
+            {selected ? <Text variant="muted">Last: {selected}</Text> : null}
+            <CommandMenu open={open} onOpenChange={setOpen} onSelect={setSelected} items={[{ label: "New File", value: "new-file", group: "Actions", shortcut: "Cmd+N" }, { label: "Save", value: "save", group: "Actions", shortcut: "Cmd+S" }, { label: "Home", value: "home", group: "Navigation" }, { label: "Settings", value: "settings", group: "Navigation" }, { label: "Sign Out", value: "signout", group: "Account" }]} />
+          </View>
+        </View>
+      </View>
+    );
+  },
+  field: () => {
+    return (
+      <View className="gap-6">
+        <Text className="text-sm text-muted-foreground">Combine labels, controls, and help text to compose accessible form fields. Supports vertical and horizontal orientations.</Text>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Vertical (default)</Text>
+          <View className="rounded-lg border border-border bg-card p-4 gap-4">
+            <Field>
+              <FieldLabel>Email</FieldLabel>
+              <Input placeholder="you@example.com" />
+              <FieldDescription>We will never share your email.</FieldDescription>
+            </Field>
+            <Field>
+              <FieldLabel>Password</FieldLabel>
+              <Input placeholder="••••••••" secureTextEntry />
+              <FieldDescription>Must be at least 8 characters.</FieldDescription>
+            </Field>
+          </View>
+        </View>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Horizontal</Text>
+          <View className="rounded-lg border border-border bg-card p-4 gap-4">
+            <Field orientation="horizontal">
+              <FieldLabel>Name</FieldLabel>
+              <Input placeholder="John Doe" className="flex-1" />
+            </Field>
+            <Field orientation="horizontal">
+              <FieldLabel>Bio</FieldLabel>
+              <Textarea placeholder="Tell us about yourself..." className="flex-1" />
+            </Field>
+          </View>
+        </View>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Error State</Text>
+          <View className="rounded-lg border border-border bg-card p-4 gap-4">
+            <Field>
+              <FieldLabel>Username</FieldLabel>
+              <Input placeholder="username" defaultValue="ab" />
+              <FieldError errors={["Username must be at least 3 characters", "Username can only contain letters and numbers"]} />
+            </Field>
+          </View>
+        </View>
+      </View>
+    );
+  },
+  "input-group": () => {
+    const [search, setSearch] = useState("");
+    return (
+      <View className="gap-6">
+        <Text className="text-sm text-muted-foreground">Add addons, buttons, and helper content to inputs. Prefixes, suffixes, and action buttons compose flexibly.</Text>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Prefix Addon</Text>
+          <View className="rounded-lg border border-border bg-card p-4 gap-3">
+            <Label>Price</Label>
+            <InputGroup>
+              <InputGroupAddon>
+                <InputGroupText>$</InputGroupText>
+              </InputGroupAddon>
+              <InputGroupInput placeholder="0.00" keyboardType="numeric" />
+            </InputGroup>
+          </View>
+        </View>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Suffix Addon</Text>
+          <View className="rounded-lg border border-border bg-card p-4 gap-3">
+            <Label>Domain</Label>
+            <InputGroup>
+              <InputGroupInput placeholder="mysite" />
+              <InputGroupAddon align="end">
+                <InputGroupText>.com</InputGroupText>
+              </InputGroupAddon>
+            </InputGroup>
+          </View>
+        </View>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">With Button</Text>
+          <View className="rounded-lg border border-border bg-card p-4 gap-3">
+            <Label>Search</Label>
+            <InputGroup>
+              <InputGroupInput placeholder="Search..." value={search} onChangeText={setSearch} />
+              <InputGroupButton onPress={() => {}}>
+                <Text className="text-sm text-foreground">Go</Text>
+              </InputGroupButton>
+            </InputGroup>
+          </View>
+        </View>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Both Sides</Text>
+          <View className="rounded-lg border border-border bg-card p-4 gap-3">
+            <Label>Transfer</Label>
+            <InputGroup>
+              <InputGroupAddon>
+                <InputGroupText>USD</InputGroupText>
+              </InputGroupAddon>
+              <InputGroupInput placeholder="0.00" keyboardType="numeric" />
+              <InputGroupButton onPress={() => {}}>
+                <Text className="text-sm text-foreground">Send</Text>
+              </InputGroupButton>
+            </InputGroup>
+          </View>
+        </View>
+      </View>
+    );
+  },
+  kbd: () => (
+    <View className="gap-6">
+      <Text className="text-sm text-muted-foreground">Display keyboard input keys. Useful for showing shortcuts in help screens, tooltips, and iPad external keyboard hints.</Text>
+      <View className="gap-2">
+        <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Single Keys</Text>
+        <View className="rounded-lg border border-border bg-card p-4">
+          <View className="flex-row flex-wrap gap-2">
+            <Kbd>Ctrl</Kbd>
+            <Kbd>Shift</Kbd>
+            <Kbd>Alt</Kbd>
+            <Kbd>Enter</Kbd>
+            <Kbd>Esc</Kbd>
+            <Kbd>Tab</Kbd>
+          </View>
+        </View>
+      </View>
+      <View className="gap-2">
+        <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Key Groups</Text>
+        <View className="rounded-lg border border-border bg-card p-4 gap-3">
+          <View className="flex-row items-center gap-3">
+            <Text className="text-sm text-foreground flex-1">Copy</Text>
+            <KbdGroup><Kbd>Cmd</Kbd><Kbd>C</Kbd></KbdGroup>
+          </View>
+          <View className="flex-row items-center gap-3">
+            <Text className="text-sm text-foreground flex-1">Paste</Text>
+            <KbdGroup><Kbd>Cmd</Kbd><Kbd>V</Kbd></KbdGroup>
+          </View>
+          <View className="flex-row items-center gap-3">
+            <Text className="text-sm text-foreground flex-1">Find</Text>
+            <KbdGroup><Kbd>Cmd</Kbd><Kbd>Shift</Kbd><Kbd>F</Kbd></KbdGroup>
+          </View>
+        </View>
+      </View>
+      <View className="gap-2">
+        <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Sizes</Text>
+        <View className="rounded-lg border border-border bg-card p-4 gap-3">
+          <View className="flex-row items-center gap-3">
+            <Text className="text-sm text-muted-foreground w-8">sm</Text>
+            <Kbd size="sm">Esc</Kbd>
+          </View>
+          <View className="flex-row items-center gap-3">
+            <Text className="text-sm text-muted-foreground w-8">md</Text>
+            <Kbd size="md">Esc</Kbd>
+          </View>
+          <View className="flex-row items-center gap-3">
+            <Text className="text-sm text-muted-foreground w-8">lg</Text>
+            <Kbd size="lg">Esc</Kbd>
+          </View>
+        </View>
+      </View>
+    </View>
+  ),
+  "hover-card": () => {
+    const [open, setOpen] = useState(false);
+    return (
+      <View className="gap-6">
+        <Text className="text-sm text-muted-foreground">Preview content behind a trigger. On mobile, triggered by long-press instead of hover. Uses @rn-primitives for positioning.</Text>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Example</Text>
+          <View className="rounded-lg border border-border bg-card p-4 items-start">
+            <HoverCard open={open} onOpenChange={setOpen}>
+              <HoverCardTrigger>
+                <Text className="text-sm font-medium text-primary underline underline-offset-4">@aniui</Text>
+              </HoverCardTrigger>
+              <HoverCardContent>
+                <View className="gap-2">
+                  <View className="flex-row items-center gap-3">
+                    <View className="h-10 w-10 rounded-full bg-primary items-center justify-center">
+                      <Text className="text-sm font-bold text-primary-foreground">A</Text>
+                    </View>
+                    <View>
+                      <Text className="text-sm font-semibold text-foreground">AniUI</Text>
+                      <Text className="text-xs text-muted-foreground">@aniui</Text>
+                    </View>
+                  </View>
+                  <Text className="text-xs text-muted-foreground">Beautiful React Native components. Copy. Paste. Ship.</Text>
+                </View>
+              </HoverCardContent>
+            </HoverCard>
+          </View>
+        </View>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Note</Text>
+          <View className="rounded-lg border border-border bg-card p-4">
+            <Text className="text-sm text-muted-foreground">On mobile, long-press the trigger to open. Requires PortalHost at app root.</Text>
+          </View>
+        </View>
+      </View>
+    );
+  },
+  "direction-provider": () => {
+    const [dir, setDir] = useState<"ltr" | "rtl">("ltr");
+    return (
+      <View className="gap-6">
+        <Text className="text-sm text-muted-foreground">RTL/LTR direction context for right-to-left language support. Wraps I18nManager and provides a useDirection hook.</Text>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Direction Toggle</Text>
+          <View className="rounded-lg border border-border bg-card p-4 gap-4">
+            <View className="flex-row gap-2">
+              <Pressable onPress={() => setDir("ltr")} className={`flex-1 items-center py-3 rounded-md border ${dir === "ltr" ? "bg-primary border-primary" : "border-input bg-background"}`}>
+                <Text className={`text-sm font-medium ${dir === "ltr" ? "text-primary-foreground" : "text-foreground"}`}>LTR</Text>
+              </Pressable>
+              <Pressable onPress={() => setDir("rtl")} className={`flex-1 items-center py-3 rounded-md border ${dir === "rtl" ? "bg-primary border-primary" : "border-input bg-background"}`}>
+                <Text className={`text-sm font-medium ${dir === "rtl" ? "text-primary-foreground" : "text-foreground"}`}>RTL</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Preview ({dir.toUpperCase()})</Text>
+          <View className="rounded-lg border border-border bg-card p-4 gap-3" style={{ direction: dir }}>
+            <Text className="text-sm font-medium text-foreground">{dir === "rtl" ? "مرحبا بالعالم" : "Hello World"}</Text>
+            <Text className="text-xs text-muted-foreground">{dir === "rtl" ? "هذا مثال على تخطيط من اليمين إلى اليسار" : "This is a left-to-right layout example"}</Text>
+            <View className="flex-row gap-2">
+              <View className="flex-1 min-h-10 rounded-md border border-input bg-background px-3 justify-center">
+                <Text className="text-xs text-muted-foreground">{dir === "rtl" ? "بحث..." : "Search..."}</Text>
+              </View>
+              <View className="min-h-10 px-4 rounded-md bg-primary justify-center">
+                <Text className="text-xs font-medium text-primary-foreground">{dir === "rtl" ? "إرسال" : "Go"}</Text>
+              </View>
+            </View>
+            <View className="gap-1.5">
+              <Text className="text-xs font-medium text-foreground">{dir === "rtl" ? "البريد الإلكتروني" : "Email"}</Text>
+              <View className="flex-row items-center rounded-md border border-input bg-background">
+                <View className="px-3 self-stretch justify-center border-e border-input">
+                  <Text className="text-xs text-muted-foreground">@</Text>
+                </View>
+                <View className="flex-1 px-3 min-h-10 justify-center">
+                  <Text className="text-xs text-muted-foreground">{dir === "rtl" ? "أدخل بريدك" : "you@example.com"}</Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Supported Languages</Text>
+          <View className="rounded-lg border border-border bg-card p-4 gap-2">
+            <View className="flex-row items-center gap-2"><View className="h-2 w-2 rounded-full bg-primary" /><Text className="text-sm text-foreground">Arabic (العربية)</Text><Text className="text-xs text-muted-foreground">RTL</Text></View>
+            <View className="flex-row items-center gap-2"><View className="h-2 w-2 rounded-full bg-primary" /><Text className="text-sm text-foreground">Hebrew (עברית)</Text><Text className="text-xs text-muted-foreground">RTL</Text></View>
+            <View className="flex-row items-center gap-2"><View className="h-2 w-2 rounded-full bg-primary" /><Text className="text-sm text-foreground">Persian (فارسی)</Text><Text className="text-xs text-muted-foreground">RTL</Text></View>
+            <View className="flex-row items-center gap-2"><View className="h-2 w-2 rounded-full bg-primary" /><Text className="text-sm text-foreground">Urdu (اردو)</Text><Text className="text-xs text-muted-foreground">RTL</Text></View>
+            <View className="flex-row items-center gap-2"><View className="h-2 w-2 rounded-full bg-muted" /><Text className="text-sm text-foreground">English</Text><Text className="text-xs text-muted-foreground">LTR</Text></View>
+            <View className="flex-row items-center gap-2"><View className="h-2 w-2 rounded-full bg-muted" /><Text className="text-sm text-foreground">French</Text><Text className="text-xs text-muted-foreground">LTR</Text></View>
+          </View>
         </View>
       </View>
     );
@@ -1038,7 +1420,20 @@ const demos: Record<string, () => React.ReactElement> = {
       </View>
     </View>
   ),
-  "tabs": () => <TabsDemo />,
+  tabs: () => {
+    return (
+      <View className="gap-6">
+        <Text className="text-sm text-muted-foreground">Tab navigation with filled/line variants, sizes, vertical, icons, disabled, and RTL.</Text>
+        <View className="gap-2"><Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Default (Filled)</Text><View className="rounded-lg border border-border bg-card p-4"><Tabs defaultValue="account"><TabsList><TabsTrigger value="account">Account</TabsTrigger><TabsTrigger value="password">Password</TabsTrigger></TabsList><TabsContent value="account"><Text variant="muted" className="py-3">Account settings.</Text></TabsContent><TabsContent value="password"><Text variant="muted" className="py-3">Password settings.</Text></TabsContent></Tabs></View></View>
+        <View className="gap-2"><Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Line Variant</Text><View className="rounded-lg border border-border bg-card p-4"><Tabs defaultValue="overview" variant="line"><TabsList><TabsTrigger value="overview">Overview</TabsTrigger><TabsTrigger value="analytics">Analytics</TabsTrigger><TabsTrigger value="reports">Reports</TabsTrigger></TabsList><TabsContent value="overview"><Text variant="muted" className="py-3">Overview content.</Text></TabsContent><TabsContent value="analytics"><Text variant="muted" className="py-3">Analytics data.</Text></TabsContent><TabsContent value="reports"><Text variant="muted" className="py-3">Reports.</Text></TabsContent></Tabs></View></View>
+        <View className="gap-2"><Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Vertical</Text><View className="rounded-lg border border-border bg-card p-4"><Tabs defaultValue="general" orientation="vertical" variant="line"><TabsList><TabsTrigger value="general">General</TabsTrigger><TabsTrigger value="security">Security</TabsTrigger><TabsTrigger value="notifs">Notifs</TabsTrigger></TabsList><TabsContent value="general"><Text variant="muted">General settings.</Text></TabsContent><TabsContent value="security"><Text variant="muted">Security.</Text></TabsContent><TabsContent value="notifs"><Text variant="muted">Notifications.</Text></TabsContent></Tabs></View></View>
+        <View className="gap-2"><Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Disabled</Text><View className="rounded-lg border border-border bg-card p-4"><Tabs defaultValue="active"><TabsList><TabsTrigger value="active">Active</TabsTrigger><TabsTrigger value="disabled" disabled>Disabled</TabsTrigger><TabsTrigger value="other">Other</TabsTrigger></TabsList><TabsContent value="active"><Text variant="muted" className="py-3">Active tab.</Text></TabsContent><TabsContent value="other"><Text variant="muted" className="py-3">Other tab.</Text></TabsContent></Tabs></View></View>
+        <View className="gap-2"><Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Icons</Text><View className="rounded-lg border border-border bg-card p-4"><Tabs defaultValue="profile"><TabsList><TabsTrigger value="profile" icon={<Text className="text-xs">👤</Text>}>Profile</TabsTrigger><TabsTrigger value="settings" icon={<Text className="text-xs">⚙️</Text>}>Settings</TabsTrigger></TabsList><TabsContent value="profile"><Text variant="muted" className="py-3">Profile.</Text></TabsContent><TabsContent value="settings"><Text variant="muted" className="py-3">Settings.</Text></TabsContent></Tabs></View></View>
+        <View className="gap-2"><Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Sizes</Text><View className="rounded-lg border border-border bg-card p-4 gap-4"><Tabs defaultValue="a" size="sm"><TabsList><TabsTrigger value="a">Small</TabsTrigger><TabsTrigger value="b">Tabs</TabsTrigger></TabsList></Tabs><Tabs defaultValue="a" size="md"><TabsList><TabsTrigger value="a">Medium</TabsTrigger><TabsTrigger value="b">Tabs</TabsTrigger></TabsList></Tabs><Tabs defaultValue="a" size="lg"><TabsList><TabsTrigger value="a">Large</TabsTrigger><TabsTrigger value="b">Tabs</TabsTrigger></TabsList></Tabs></View></View>
+        <View className="gap-2"><Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">RTL</Text><View className="rounded-lg border border-border bg-card p-4" style={{ direction: "rtl" }}><Tabs defaultValue="home" variant="line"><TabsList><TabsTrigger value="home">الرئيسية</TabsTrigger><TabsTrigger value="settings">الإعدادات</TabsTrigger></TabsList><TabsContent value="home"><Text variant="muted" className="py-3">محتوى الرئيسية</Text></TabsContent><TabsContent value="settings"><Text variant="muted" className="py-3">الإعدادات</Text></TabsContent></Tabs></View></View>
+      </View>
+    );
+  },
   collapsible: () => {
     const [open1, setOpen1] = useState(false);
     const [open2, setOpen2] = useState(true);
@@ -1053,7 +1448,7 @@ const demos: Record<string, () => React.ReactElement> = {
               </View>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <View className="px-4 pb-3"><Text className="text-xs text-muted-foreground">A shadcn/ui-style component library for React Native with 80+ components.</Text></View>
+              <View className="px-4 pb-3"><Text className="text-xs text-muted-foreground">A shadcn/ui-style component library for React Native with 89 components.</Text></View>
             </CollapsibleContent>
           </View>
         </Collapsible>
